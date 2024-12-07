@@ -136,11 +136,35 @@ void baca_Tds() {
   display.display();
 }
 
+/* Backup
 void baca_pH() {
   float Value = analogRead(pin::potPin);
   sensor::pHVoltage = Value * (device::aref / 4095.0);
   sensor::ph = 3.3 * sensor::pHVoltage;
 
+  Serial.print("pH Voltage: "); Serial.println(sensor::pHVoltage);
+  Serial.print("pH Value: "); Serial.println(sensor::ph);
+}
+*/
+void baca_pH() {
+  // Baca tegangan dari sensor
+  float Value = analogRead(pin::potPin);
+  sensor::pHVoltage = Value * (device::aref / 4095.0);
+
+  // Data kalibrasi (tegangan disesuaikan dengan pengukuran sensor pada buffer pH)
+  float voltage_at_pH9_14 = 2.5; // Tegangan aktual pada buffer pH 9.14
+  float voltage_at_pH6_68 = 2.0; // Tegangan aktual pada buffer pH 6.68
+  float pH_at_pH9_14 = 9.14;
+  float pH_at_pH6_68 = 6.68;
+
+  // Hitung gradien (m) dan offset (c)
+  float m = (pH_at_pH9_14 - pH_at_pH6_68) / (voltage_at_pH9_14 - voltage_at_pH6_68);
+  float c = pH_at_pH9_14 - m * voltage_at_pH9_14;
+
+  // Hitung pH menggunakan kalibrasi
+  sensor::ph = m * sensor::pHVoltage + c;
+
+  // Debugging
   Serial.print("pH Voltage: "); Serial.println(sensor::pHVoltage);
   Serial.print("pH Value: "); Serial.println(sensor::ph);
 }
